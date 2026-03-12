@@ -1,0 +1,36 @@
+{
+  "name": "git-assist",
+  "version": "1.0.0",
+  "description": "A global npm package to easily manage git repositories, branches, and workflows interactively",
+  "main": "index.js",
+  "bin": {
+    "git-assist": "./bin/git-assist.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "git",
+    "workflow",
+    "branch",
+    "merge",
+    "sync",
+    "cli",
+    "assist"
+  ],
+  "author": "Aiken Gunay",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aikengunay/git-assist.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aikengunay/git-assist/issues"
+  },
+  "homepage": "https://github.com/aikengunay/git-assist#readme",
+  "dependencies": {
+    "inquirer": "^8.2.6",
+    "inquirer-autocomplete-prompt": "^2.0.0",
+    "chalk": "^4.1.2"
+  }
+}
