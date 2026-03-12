@@ -22,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/aikengunay/gasi.git"
+    "url": "https://github.com/aikengunay/gassist.git"
   },
   "bugs": {
-    "url": "https://github.com/aikengunay/gasi/issues"
+    "url": "https://github.com/aikengunay/gassist/issues"
   },
-  "homepage": "https://github.com/aikengunay/gasi#readme",
+  "homepage": "https://github.com/aikengunay/gassist#readme",
   "dependencies": {
     "inquirer": "^8.2.6",
     "inquirer-autocomplete-prompt": "^2.0.0",

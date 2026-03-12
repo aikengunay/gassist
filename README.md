@@ -28,8 +28,8 @@ After this one-time setup, you can use `npm install -g` for any package without 
 For development or to install from source:
 
 ```bash
-git clone https://github.com/aikengunay/gasi.git
-cd gasi
+git clone https://github.com/aikengunay/gassist.git
+cd gassist
 npm install -g .
 ```
 
