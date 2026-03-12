@@ -1,4 +1,4 @@
-# git-assist
+# gasi
 
 A CLI tool for managing git repositories, branches, and workflows interactively with a user-friendly interface.
 
@@ -7,7 +7,7 @@ A CLI tool for managing git repositories, branches, and workflows interactively 
 ### From npm (Recommended)
 
 ```bash
-npm install -g git-assist
+npm install -g gasi
 ```
 
 **Linux users (one-time setup):**
@@ -28,32 +28,32 @@ After this one-time setup, you can use `npm install -g` for any package without 
 For development or to install from source:
 
 ```bash
-git clone https://github.com/aikengunay/git-assist.git
-cd git-assist
+git clone https://github.com/aikengunay/gasi.git
+cd gasi
 npm install -g .
 ```
 
-The `-g` flag installs the package globally, making `git-assist` available from any directory in your terminal.
+The `-g` flag installs the package globally, making `gasi` available from any directory in your terminal.
 
 ## Usage
 
 ```bash
-git-assist
+gasi
 ```
 
-Run `git-assist` from within any git repository directory. The tool will show your current status and guide you through git workflows and branch management.
+Run `gasi` from within any git repository directory. The tool will show your current status and guide you through git workflows and branch management.
 
 **Examples:**
 
 ```bash
 # Interactive git workflow management
-git-assist
+gasi
 
 # Show version
-git-assist --version
+gasi --version
 
 # Show help
-git-assist --help
+gasi --help
 ```
 
 ## Features
@@ -94,7 +94,7 @@ Full support (for npm global installs, configure npm prefix to avoid permission 
 ## Uninstall
 
 ```bash
-npm uninstall -g git-assist
+npm uninstall -g gasi
 ```
 
 ## Contributing
