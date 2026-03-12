@@ -267,12 +267,12 @@ function showVersion() {
 
 function showHelp() {
   console.log(`
-${chalk.bold('gasi')} - Interactive git workflow and branch management
+${chalk.bold('gassist')} - Interactive git workflow and branch management
 
 ${chalk.bold('Usage:')}
-  gasi                     Interactive git workflow management
-  gasi --version           Show version
-  gasi --help              Show this help message
+  gassist                     Interactive git workflow management
+  gassist --version           Show version
+  gassist --help              Show this help message
 
 ${chalk.bold('Features:')}
   • View repository status (branch, ahead/behind, uncommitted changes)
