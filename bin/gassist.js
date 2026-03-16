@@ -162,14 +162,25 @@ function fetchRemote() {
 function pullCurrentBranch() {
   try {
     const branch = getCurrentBranch();
-    log(`Pulling latest changes for ${branch}...`, 'info');
     
-    const result = spawnSync('git', ['pull'], {
+    // Always fetch first to get latest remote state
+    log('Fetching latest changes from remote...', 'info');
+    const fetchResult = spawnSync('git', ['fetch'], {
       stdio: 'inherit',
     });
     
-    if (result.status !== 0) {
-      throw new Error(`Git pull failed with exit code ${result.status}`);
+    if (fetchResult.status !== 0) {
+      throw new Error(`Git fetch failed with exit code ${fetchResult.status}`);
+    }
+    
+    // Now pull the latest changes
+    log(`Pulling latest changes for ${branch}...`, 'info');
+    const pullResult = spawnSync('git', ['pull'], {
+      stdio: 'inherit',
+    });
+    
+    if (pullResult.status !== 0) {
+      throw new Error(`Git pull failed with exit code ${pullResult.status}`);
     }
     
     success(`✓ Pull completed for ${branch}`);
@@ -213,6 +224,92 @@ function switchBranch(branchName) {
     error(`✗ Failed to switch branch: ${err.message}`);
     return false;
   }
+}
+
+function getCommits(branchName, limit = 50) {
+  try {
+    const branch = branchName || getCurrentBranch();
+    const result = execSync(
+      `git log ${branch} --pretty=format:"%h|%an|%ar|%s" --max-count=${limit}`,
+      { encoding: 'utf8' }
+    );
+    
+    if (!result.trim()) {
+      return [];
+    }
+    
+    return result.trim().split('\n').map(line => {
+      const [hash, author, date, ...messageParts] = line.split('|');
+      return {
+        hash: hash.trim(),
+        author: author.trim(),
+        date: date.trim(),
+        message: messageParts.join('|').trim(),
+      };
+    });
+  } catch (err) {
+    return [];
+  }
+}
+
+function checkoutCommit(commitHash) {
+  try {
+    log(`Checking out commit ${commitHash}...`, 'info');
+    
+    const result = spawnSync('git', ['checkout', commitHash], {
+      stdio: 'inherit',
+    });
+    
+    if (result.status !== 0) {
+      throw new Error(`Failed to checkout commit: ${commitHash}`);
+    }
+    
+    success(`✓ Checked out commit: ${commitHash}`);
+    log('Note: You are now in detached HEAD state. Create a branch if you want to make changes.', 'warning');
+    return true;
+  } catch (err) {
+    error(`✗ Failed to checkout commit: ${err.message}`);
+    return false;
+  }
+}
+
+async function promptCommitSelection() {
+  const currentBranch = getCurrentBranch();
+  
+  if (!currentBranch) {
+    error('Could not determine current branch.');
+  }
+  
+  log(`Loading commits for branch: ${currentBranch}...`, 'info');
+  const commits = getCommits(currentBranch);
+  
+  if (commits.length === 0) {
+    log('No commits found for this branch.', 'warning');
+    return null;
+  }
+  
+  // Format commit choices
+  const choices = commits.map((commit, index) => {
+    const isCurrent = index === 0;
+    const indicator = isCurrent ? chalk.green('(current)') : '';
+    return {
+      name: `${chalk.cyan(commit.hash)} ${chalk.gray(`- ${commit.author}`)} ${chalk.gray(`(${commit.date})`)} ${indicator}\n  ${commit.message}`,
+      value: commit.hash,
+      short: commit.hash,
+    };
+  });
+  
+  const { selectedCommit } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'selectedCommit',
+      message: `Select a commit to checkout (${commits.length} commits shown):`,
+      choices: choices,
+      pageSize: 15,
+    },
+  ]);
+  
+  return selectedCommit;
 }
 
 function showStatus() {
@@ -281,6 +378,7 @@ ${chalk.bold('Features:')}
   • Interactive branch switching with search
   • Create new branches with conventional naming (feature/, fix/, etc.)
   • Merge branches into main/master with conflict detection
+  • View and checkout commits interactively
   • Delete branches (local and remote) after merging
   • Automatic branch creation from remote if needed
 `);
@@ -823,6 +921,10 @@ async function promptMainAction(status) {
       value: 'merge',
     },
     {
+      name: 'View commits',
+      value: 'commits',
+    },
+    {
       name: 'Show status only',
       value: 'status',
     },
@@ -926,10 +1028,13 @@ async function main() {
 
   switch (action) {
     case 'pull':
-      if (status && status.behind > 0) {
-        pullCurrentBranch();
-      } else {
-        log('Branch is already up to date.', 'info');
+      // Always fetch and pull to ensure we have the latest changes
+      pullCurrentBranch();
+      // Show updated status after pull
+      const updatedStatus = getBranchStatus();
+      if (updatedStatus) {
+        console.log('\n');
+        showStatus();
       }
       break;
 
@@ -979,6 +1084,19 @@ async function main() {
 
     case 'merge':
       await promptMergeBranch();
+      break;
+
+    case 'commits':
+      const selectedCommit = await promptCommitSelection();
+      if (selectedCommit) {
+        checkoutCommit(selectedCommit);
+        // Show status after checkout
+        const newStatus = getBranchStatus();
+        if (newStatus) {
+          console.log('\n');
+          showStatus();
+        }
+      }
       break;
 
     case 'status':
